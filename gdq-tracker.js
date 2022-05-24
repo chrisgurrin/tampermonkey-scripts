@@ -21,6 +21,15 @@ const previousRunsCss = {
 };
 const activeRunCss = {'background-color': `${blue}`}; //change blue to red here for red highlight color!
 
+const getDateStrFromHeader = (header) => {
+    const tr = $(header);
+    const headerText = tr.children('td:first').html();
+    const split = headerText.split(' ');
+    const day = split[2].substring(0, split[2].length-2);
+    const month = split[1];
+    return `${day} ${month} ${new Date().getFullYear()}`;
+}
+
 const getCurrentDayHeader = () => {
     var zeroNow = new Date(now);
     zeroNow.setHours(0,0,0,0);
@@ -34,15 +43,6 @@ const getCurrentDayHeader = () => {
         }
         return false;
     });
-}
-
-const getDateStrFromHeader = (header) => {
-    const tr = $(header);
-    const headerText = tr.children('td:first').html();
-    const split = headerText.split(' ');
-    const day = split[2].substring(0, split[2].length-2);
-    const month = split[1];
-    return `${day} ${month} ${new Date().getFullYear()}`;
 }
 
 const highlightRun = (tr) => {
@@ -65,10 +65,10 @@ const getTimeUnitHtml = (time, unit) => {
 
 const updateTimer = (firstRunTime) => {
     const diff = firstRunTime - new Date().getTime();
-    var days = diff / (1000 * 60 * 60 * 24);
-    var hours = (days - Math.floor(days)) * 24;
-    var mins = (hours - Math.floor(hours)) * 60;
-    var secs = (mins - Math.floor(mins)) * 60;
+    const days = diff / (1000 * 60 * 60 * 24);
+    const hours = (days - Math.floor(days)) * 24;
+    const mins = (hours - Math.floor(hours)) * 60;
+    const secs = (mins - Math.floor(mins)) * 60;
 
     setStatusHeader(`Event begins in: ${getTimeUnitHtml(days, 'days')} ${getTimeUnitHtml(hours, 'hours')} ${getTimeUnitHtml(mins, 'minutes')} ${getTimeUnitHtml(secs, 'seconds')}`);
 
@@ -80,16 +80,16 @@ const updateTimer = (firstRunTime) => {
     }
 }
 
-const createStatusHeader = () => {
-    $('h1.text-gdq-red').after(`<h2 id="divStatus" class="extra-spacing"></h2>`);
-}
-
 const setStatusHeader = (status) => {
-    $('#divStatus').html(status);
+    $('#status').html(status);
 }
 
+// main
 $(document).ready(() => {
-    createStatusHeader();
+    // create status header
+    $('h1.text-gdq-red').after(`<h2 id="status" class="extra-spacing"></h2>`);
+
+    // check for current run
     const header = getCurrentDayHeader();
     if(header){
         $(header).nextAll('tr').not('.second-row').each(function(){
@@ -100,6 +100,7 @@ $(document).ready(() => {
         });
         setStatusHeader(`<h2>${liveEventStatus}</h2>`);
     }
+    // show countdown
     else{
         const firstDayHeader = $('tr.day-split').toArray()[1];
         const firstRunRow = $(firstDayHeader).next('tr');
